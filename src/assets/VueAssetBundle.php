@@ -14,21 +14,29 @@
 
         protected function loadPath( string $path, bool $recursively = true ) {
 
-            $path = realpath( $path );
-            $assets_path = $this->sourcePath ? realpath( $this->sourcePath ) : realpath( $this->basePath );
+            $path = realpath( \Yii::getAlias( $path ) );
+            $assets_path = $this->sourcePath ? realpath( \Yii::getAlias( $this->sourcePath ) ) : realpath( \Yii::getAlias( $this->basePath ) );
 
-            if ( $this->sourcePath && strpos( realpath( $path ), realpath( $this->sourcePath ) ) !== 0 ) {
+            if ( $this->sourcePath && strpos( $path, $assets_path ) !== 0 ) {
 
                 throw new \Exception( 'A given path must be within the sourcePath or sourcePath must be NULL to use basePath.' );
-            } elseif ( $this->basePath && strpos( realpath( $path ), realpath( $this->basePath ) ) !== 0 ) {
+            } elseif ( $this->basePath && strpos( $path, $assets_path ) !== 0 ) {
 
                 throw new \Exception( 'A given path must be within either sourcePath or basePath.' );
+            } elseif ( !$this->sourcePath && !$this->basePath ) {
+
+                throw new \Exception( 'Either sourcePath or basePath must be specified.' );
             }
 
             $relative_path = str_replace( '\\', '/', substr( $path, strlen( $assets_path ) ) );
-            if ( $relative_path && $relative_path[0] === '/' ) {
+            if ( strlen( $relative_path ) > 1 && $relative_path[0] === '/' ) {
 
                 $relative_path = substr( $relative_path, 1 );
+            }
+
+            if ( !str_ends_with( $relative_path, '/' ) ) {
+
+                $relative_path .= '/';
             }
 
             if ( $recursively ) {
