@@ -17,13 +17,9 @@
             'js/components/model.js',
         ];
 
-        public $depends = [];
-
         public $jsOptions = [
             'position' => View::POS_HEAD
         ];
-
-        public $publishOptions = [ 'forceCopy' => true ];
 
         public $use_vue_dependancy = null;
 
@@ -31,7 +27,7 @@
 
             if ( $this->use_vue_dependancy === null ) {
 
-                $this->use_vue_dependancy = ArrayHelper::getValue( \Yii::$app->params, 'bsDependencyEnabled', true );
+                $this->use_vue_dependancy = ArrayHelper::getValue( \Yii::$app->params, 'use_vue_dependancy', true );
             }
 
             if ( $this->use_vue_dependancy ) {
