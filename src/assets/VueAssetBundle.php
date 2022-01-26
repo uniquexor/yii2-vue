@@ -5,7 +5,7 @@
     use RecursiveIteratorIterator;
     use yii\web\AssetBundle;
 
-    class Yii2VueBaseAssets extends AssetBundle {
+    class VueAssetBundle extends AssetBundle {
 
         public string $applications_path = 'js/apps/';
         public string $mixins_path = 'js/mixins/';
