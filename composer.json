@@ -1,0 +1,31 @@
+{
+    "name": "unique/yii2-vue",
+    "description": "Easier use of vue in Yii2 framework.",
+    "minimum-stability": "stable",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Algirdas Gurevičius",
+            "email": "a.gurevicius@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "yiisoft/yii2": "~2.0.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "unique\\yii2vue\\": "src/",
+            "unique\\yii2vuetest\\": "tests/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ]
+}
