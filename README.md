@@ -1,6 +1,6 @@
 # yii2-vue
 
-This package provides a very basic models management system for VUE3 on yii2 framework. 
+This package provides a very basic models management system for Vuejs v3 on yii2 framework. 
 In addition, allows to easily control your vue app assets using yii2 AssetBundle.
 
 ## Installation
@@ -102,7 +102,7 @@ A basic model file could look like this:
 class MyModel extends Model {
 
     /**
-     * The data to be passed to the API to create or update the model.
+     * The data to be passed to the API to create or update the model. (like a serialization of the Model)
      * @returns {Object}
      */
     toBody() {
@@ -149,14 +149,18 @@ by extending it):
 
 ```js
     let my_models_manager = new ModelsManager( {
+        access_token: '(string) An access token, that, if provided, will be sent with API requests' + 
+            'as a basic Auth header. The string will be sent as a username.',
+    
         url_create: '(string) A URL that will be used to create new Models',
         url_update: '(string) A URL that will be used to update Models',
         url_delete: '(string) A URL that will be used to delete Models',
         url_list: '(string) A URL that will be used to reload data',
 
-        endpoint_model_class: '(string) A php class name of the model used in the backend. (can be used to update many managers data at once)',
-        model_class: '(string) A JS class name, that will be created by this Manager',
-        model_id: '(string, default="id") a property, which will be used to index models'
+        endpoint_model_class: '(string) A php class name of the model used in the backend. (can be' +
+            'used to update many managers data at once)',
+        model_class: '(string) A JS model\'s class name, that will be created by this Manager',
+        model_id: '(string, default="id") a property, which will be used to index models by'
     } );
 
     my_models_manager.setData( 
@@ -189,7 +193,7 @@ or updated (when false).
 - `static handleUnsuccessfulRequest( model: Model, data: Array|Object, default_key: string )`
 @todo need to be replaced/updated...
 
-- `removeItem( item_id: string|int, remove_from_data: bool )`
+- `deleteItem( item_id: string|int, remove_from_data: bool )`
 Calls the API to remove the given ID. If `remove_from_data` is true, then after
 a successful call, data is also removed from the Manager.
 

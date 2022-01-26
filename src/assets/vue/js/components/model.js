@@ -1,16 +1,47 @@
+/**
+ * A base Model class.
+ */
 class Model {
 
-    is_loading = false;
-    field_loading = {};
-    errors = {};
-    models_manager;
+    /**
+     * Indicates if the record does not exist in the DB. If so, create action will be used to save it, otherwise - update.
+     * @type {boolean}
+     */
     is_new_record = true;
 
-    constructor( models_manager, attrs ) {
+    /**
+     * Indicates if the model is being loaded. It is set to true, once an API call has been made and set to false, once the response has been received.
+     * @type {boolean}
+     */
+    is_loading = false;
+
+    /**
+     * Stores individual is_loading states for each of the field in the Model (if there is a need for it).
+     * @type {boolean[]}
+     */
+    field_loading = {};
+
+    /**
+     * Stores an error message for each of the field in the Model.
+     * @type {String[]}
+     */
+    errors = {};
+
+    /**
+     * @type {ModelsManager}
+     */
+    models_manager;
+
+    /**
+     * Creates a model, assigning it its property and relation values.
+     * @param {ModelsManager} models_manager
+     * @param {Object} properties
+     */
+    constructor( models_manager, properties ) {
 
         this.models_manager = models_manager;
 
-        // First we initialize the default attributes and relations:
+        // First we initialize the default properties and relations:
 
         let relations = this.relations();
 
@@ -41,51 +72,21 @@ class Model {
             this[ attr ] = ( relations[ attr ].type === Relation.TYPE_HAS_MANY ) ? {} : new relations[ attr ].class_name;
         }
 
-        // Then we set values from attrs:
+        // Then we set values from properties:
 
-        this.setAttributes( attrs );
+        this.setProperties( properties );
     }
 
-    setAttributes( attrs ) {
+    /**
+     * Sets or updates values for properties and creates Model's relations.
+     * @param {Object} properties
+     * @param {boolean} delete_missing
+     */
+    setProperties( properties, delete_missing = true ) {
 
         let relations = this.relations();
 
-        for ( let key in attrs ) {
-
-            if ( relations[ key ] ) {
-
-                let relation = relations[ key ];
-
-                // @todo check for a setter?
-                if ( Array.isArray( attrs[ key ] ) ) {
-
-                    let relation_objs = {};
-                    for ( let i in attrs[ key ] ) {
-
-                        attrs[ key ][i] = $.extend( { is_new_record : this.is_new_record }, attrs[ key ][i] );
-
-                        let relation_obj = Reflect.construct( relation.class_name, [ this.models_manager, attrs[ key ][i] ] );
-                        relation_objs[ relation.key ? relation_obj[ relation.key ] : relation_obj.getPrimaryKey() ] = relation_obj;
-                    }
-
-                    Vue.set( this, key, relation_objs );
-                } else {
-
-                    attrs[ key ] = $.extend( { is_new_record : this.is_new_record }, attrs[ key ] );
-                    Vue.set( this, key, Reflect.construct( relation.class_name, [ this.models_manager, attrs[ key ] ] ) );
-                }
-            } else {
-
-                this[ key ] = attrs[ key ];
-            }
-        }
-    }
-
-    updateData( new_data ) {
-
-        let relations = this.relations();
-
-        for ( let key in new_data ) {
+        for ( let key in properties ) {
 
             if ( relations[ key ] ) {
 
@@ -95,57 +96,79 @@ class Model {
 
                     let used_keys = {};
 
-                    for ( let i in new_data[ key ] ) {
+                    for ( let i in properties[ key ] ) {
 
                         used_keys[ i ] = i;
                         if ( this[ key ][ i ] ) {
 
-                            this[ key ][ i ].updateData( new_data[ key ][ i ] );
+                            this[ key ][ i ].setProperties( properties[ key ][ i ], delete_missing );
                         } else {
 
-                            new_data[ key ][i] = $.extend( { is_new_record : false }, new_data[ key ][i] );
+                            properties[ key ][i] = $.extend( { is_new_record : this.is_new_record }, properties[ key ][i] );
 
-                            let relation_obj = Reflect.construct( relation.class_name, [ this.models_manager, new_data[ key ][i] ] );
+                            let relation_obj = Reflect.construct( relation.class_name, [ this.models_manager, properties[ key ][i] ] );
                             Vue.set( this[ key ], i, relation_obj );
                         }
                     }
 
-                    for ( let i in this[ key ] ) {
+                    if ( !delete_missing ) {
 
-                        if ( !used_keys[ i ] ) {
+                        for ( let i in this[ key ] ) {
 
-                            Vue.delete( this[ key ], i );
+                            if ( !used_keys[ i ] ) {
+
+                                Vue.delete( this[ key ], i );
+                            }
                         }
                     }
                 } else {
 
-                    this[ key ].updateData( new_data[ key ] );
+                    this[ key ].setProperties( properties[ key ], delete_missing );
                 }
             } else {
 
-                if ( this[ key ] !== new_data[ key ] ) {
+                if ( this[ key ] !== properties[ key ] ) {
 
-                    this[ key ] = new_data[ key ];
+                    this[ key ] = properties[ key ];
                 }
             }
         }
     }
 
+    /**
+     * Defines Model's relational properties.
+     * Each relation must be of {@see Relation} type.
+     * Properties are indexed by the relation name.
+     * @returns {{Relation}}
+     */
     relations() {
 
         return {};
     }
 
+    /**
+     * Returns a primary key of the Object.
+     * @returns {string|int|null}
+     */
     getPrimaryKey() {
 
         return this.id;
     }
 
-    updateLoadingField( field, is_loading ) {
+    /**
+     * Set if a certain Model's property is being loaded.
+     * @param {string} field
+     * @param {boolean} is_loading
+     */
+    updatePropertyLoading( field, is_loading ) {
 
         Vue.set( this.field_loading, field, is_loading );
     }
 
+    /**
+     * The data to be passed to the API to create or update the model (like a serialization of the Model)
+     * @returns {Object}
+     */
     toBody() {
 
         let data = {};
