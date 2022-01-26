@@ -1,5 +1,5 @@
 <?php
-    namespace app\commands;
+    namespace unique\yii2vue\commands;
 
     use yii\console\Controller;
     use yii\db\ActiveRecord;
