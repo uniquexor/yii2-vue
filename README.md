@@ -232,3 +232,24 @@ of cars of the same make_id. Then our API, could return data like this:
 
 We could now call `ModelsManagerRegister.updateListChanges( data )`, which, providing
 we have created ModelsManager for both `Car` and `Stat` models, would update data in them.
+
+
+## Creating JS model files, using a Yii2 command
+
+You can easily create a JS model, by calling:
+```
+    yii vue-assets/generate-model [PHP_CLASS_NAME]
+```
+
+If you skip the [PHP_CLASS_NAME], you will be required to specify it, once the command runs.
+This should be a fully namespaced class name.
+
+You should also specify where to put the generated models in your config/console.php file:
+```php
+    'controllerMap' => [
+        'vue-assets' => [
+            'class' => \unique\yii2vue\commands\VueAssetsController::class,
+            'vue_asset_models_path' => ... // path to directory where to put generated JS models,
+        ]
+    ],
+```
