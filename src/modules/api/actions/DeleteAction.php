@@ -1,5 +1,5 @@
 <?php
-    namespace unique\yii2vue\modules\api\components;
+    namespace unique\yii2vue\modules\api\actions;
 
     class DeleteAction extends \yii\rest\DeleteAction {
 
