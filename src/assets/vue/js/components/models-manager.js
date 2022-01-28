@@ -110,9 +110,9 @@ class ModelsManager {
 
                 _this.is_loading = false;
 
-                if ( data ) {
+                if ( data.success ) {
 
-                    _this.refreshData( data );
+                    _this.updateData( data.data, true );
                 }
 
                 return data;
@@ -126,15 +126,12 @@ class ModelsManager {
     }
 
     /**
-     * If only_update is false or not set, this will iterate all the models managed by this manager and update their
-     * properties to reflect given new data. If models need to be created - they will be,
-     * if need to be deleted - they will be. Relations are also updated.
-     *
-     * If only_update is true, then current models will only be updated with properties from new_data.
-     * New models will not be created and old models will not be deleted.
+     * This will iterate all the models managed by this manager and update their properties to reflect given new data.
+     * If models need to be created - they will be.
+     * However, objects will only be deleted from the store if delete_missing === true
      *
      * @param {Object} new_data - New data to be set. Must be indexed using the same keys as `ModelsManager.data`
-     * @param {boolean} delete_missing - If true - will delete record not in the new_data Object, otherwise - will only create new and update old.
+     * @param {boolean} delete_missing - If true - will delete records not in the new_data Object.
      */
     updateData( new_data, delete_missing = true ) {
 
@@ -146,7 +143,7 @@ class ModelsManager {
             if ( this.data[ i ] ) {
 
                 this.data[ i ].setProperties( new_data[ i ], delete_missing );
-            } else if ( !only_update ) {
+            } else {
 
                 new_data[ i ] = $.extend( { is_new_record : false }, new_data[ i ] );
 
@@ -155,7 +152,7 @@ class ModelsManager {
             }
         }
 
-        if ( !only_update ) {
+        if ( delete_missing ) {
 
             for ( let i in this.data ) {
 
@@ -194,7 +191,7 @@ class ModelsManager {
     }
 
     /**
-     * Adds a model to the data store.
+     * Adds a model to the data store (without calling the API).
      * @param {Model} model - Model to be added.
      * @param {boolean} new_record - The `is_new_record` attribute of the model will be set to this value.
      */
@@ -205,6 +202,57 @@ class ModelsManager {
         Vue.set( this.data, model[ this.model_id ], model );
     }
 
+    /**
+     * Sets field errors on {@see Model.errors} according to the `data` response.
+     * `data` - has the following structure:
+     * ```json
+     * {
+     *     success: boolean, // was an operation successful. If it's given here, then usually this should be set to false.,
+     *     data: object, // either a serialized Yii2 Exception, or a serialized Model with validation errors.
+     * }
+     * ```
+     *
+     * ### When `data.data` is a seriliazed Yii2 Exception, it will have the following fields:
+     * ```json
+     * {
+     *     name: string,   // Exception class name,
+     *     message: string,    // Exception message
+     * }
+     * ```
+     * The error will be set to the provided `default_key` property of the model.
+     *
+     * ### When `data.data` is a serialized Yii2 Model with validation errors, it will have the following structure:
+     * ```json
+     * [
+     *     {
+     *         field: string,      // Field name that violated a validation rule,
+     *         message: string,    // Validation message
+     *     },
+     *     ...
+     * ]
+     * ```
+     *
+     * An error for Model's relation can also be set, by providing a full path in the `field`.
+     * For example if model Brand had a HAS_MANY relation named cars with Car class and a HAS_ONE relation manufacturer with Manufacturer class,
+     * after making an unsuccessful request to the API, we could receive the following response:
+     *
+     * ```json
+     * {
+     *     success: false,
+     *     data: [
+     *         { field: "name", message: "Bad name" },          // This is an error for Brand.name property
+     *         { field: "cars.3.engine", message: "..." },      // This is an error for Brand.cars[3].engine property and will accordingly be set on a Car class
+     *         { field: "manufacturer.year", message: "..." }   // This is an error for Brand.manufacturer.year property and will be set on a Manufacturer class
+     *     ]
+     * }
+     * ```
+     *
+     * Keep in mind, Yii2 does not have relational save capabilities natively, thus, you need to implement the back end logic yourself.
+     *
+     * @param {Model} model - Model to set the errors on
+     * @param {object} data - Errors
+     * @param {string} default_key - Property of the Model where to set Exceptions on
+     */
     static handleUnsuccessfulRequest( model, data, default_key ) {
 
         if ( data.data.name ) {
@@ -281,13 +329,16 @@ class ModelsManager {
 
     /**
      * Performs a DELETE API call to the given {@see url_delete} url.
+     * Additional data can be passed, by providing a `request_data` object.
+     * It will be merged with the Model's data to be saved. (Model's data takes precedence).
      * Models's {@see Model.setPrimaryKeys()} is used to set the id for the request.
      *
      * @param {Model|int|string} item - Model or Model's ID from the ModelsManager data store to be deleted
+     * @param {Object} request_data - Additional request data to the request (i.e. csrf)
      * @param {boolean} remove_from_data - After a successful API call, should the data be deleted from the ModelsManager's store as well?
      * @returns {Promise}
      */
-    deleteItem( item, remove_from_data = true ) {
+    deleteItem( item, request_data = {}, remove_from_data = true ) {
 
         let item_id = item;
         if ( !( item instanceof Model ) ) {
@@ -314,7 +365,7 @@ class ModelsManager {
 
         let _this = this;
 
-        return this.request( 'DELETE', url, data, item )
+        return this.request( 'DELETE', url, $.extend( {}, request_data, data ), item )
             .then(
                 function ( data ) {
 
@@ -339,11 +390,11 @@ class ModelsManager {
      * Calls the API to create or update the given model.
      * Additional data can be passed, by providing a `request_data` object.
      * It will be merged with the Model's data to be saved. (Model's data takes precedence).
-     * @param {Model} item
-     * @param {Object} request_data
+     * @param {Model} item - Model to be saved
+     * @param {Object} request_data - Additional request data to the request (i.e. csrf)
      * @returns {Promise}
      */
-    saveItem( item, request_data ) {
+    saveItem( item, request_data = {} ) {
 
         let data = $.extend( {}, request_data, item.toBody() );
         let _this = this;
@@ -377,7 +428,13 @@ class ModelsManager {
                 },
                 function ( jqXhr, status, status_text ) {
 
-                    Vue.set( item.errors, _this.model_id, status + ': ' + status_text );
+                    if ( jqXhr.responseJSON ) {
+
+                        ModelsManager.handleUnsuccessfulRequest( item, jqXhr.responseJSON, _this.model_id );
+                    } else {
+
+                        Vue.set( item.errors, _this.model_id, status + ': ' + status_text );
+                    }
                 }
             );
     }

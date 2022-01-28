@@ -12,6 +12,9 @@ This component requires php >= 8.0. To install it, add the following to your com
     },
 ```
 
+For now this package depends on JQuery to do ajax calls and other stuff. Should probably
+decouple it in the future...
+
 ## Usage
 
 To use this package, you need to create your own AssetBundle file and define your VUE
@@ -174,24 +177,69 @@ by extending it):
 - `reloadData()`
 Used to reload data in the manager. url_list must be specified.
 
-- `refreshData( new_data: Array )`
-This will iterate all the models managed by this manager and update their
-properties to reflect given new data. If models need to be created - they will be,
-if need to be deleted - they will be. Relations are also updated.
-`new_data` must be indexed using the same keys as `ModelsManager.data`.
+- `updateData( new_data: Object, delete_missing: boolean = true )`
+This will iterate all the models managed by this manager and update their properties to 
+reflect given new data. If models need to be created - they will be.
+However, objects will only be deleted from the store if delete_missing === true
+`new_data` and it's relations must be indexed using the same keys as in
+`ModelsManager.data`.
 
-- `setData( models: Array, new_records: bool )` 
-Creates models using the data provided. All previous data is replaced.
+- `setData( models: Array, new_records: bool )`
+Wipes old data from the Manager and sets new data, by creating new models.
 `new_records` parameter is used to set if the Model needs to be created (when true),
 or updated (when false).
 
 - `addItem( item: Model, new_record: bool )`
-Adds a new Model to the manager (Does not call the API).
+Adds a model to the data store (without calling the API).
 `new_records` parameter is used to set if the Model needs to be created (when true),
 or updated (when false).
 
-- `static handleUnsuccessfulRequest( model: Model, data: Array|Object, default_key: string )`
-@todo need to be replaced/updated...
+- `static handleUnsuccessfulRequest( model: Model, data: Object, default_key: string )`
+Sets field errors on {@see Model.errors} according to the `data` response.
+`data` - has the following structure:
+```json
+{
+    success: boolean, // was an operation successful. If it's given here, then usually this should be set to false.,
+    data: object, // either a serialized Yii2 Exception, or a serialized Model with validation errors.
+}
+```
+
+**When `data.data` is a seriliazed Yii2 Exception, it will have the following fields:**
+```json
+{
+    name: string,   // Exception class name,
+    message: string,    // Exception message
+}
+```
+The error will be set to the provided `default_key` property of the model.
+
+**When `data.data` is a serialized Yii2 Model with validation errors, it will have the following structure:**
+```json
+[
+    { 
+        field: string,      // Field name that violated a validation rule,
+        message: string,    // Validation message
+    },
+    ...
+]
+```
+
+An error for Model's relation can also be set, by providing a full path in the `field`.
+For example if model Brand had a HAS_MANY relation named cars with Car class and a HAS_ONE relation manufacturer with Manufacturer class,
+after making an unsuccessful request to the API, we could receive the following response:
+
+```json
+{
+    success: false,
+    data: [
+        { field: "name", message: "Bad name" },          // This is an error for Brand.name property
+        { field: "cars.3.engine", message: "..." },      // This is an error for Brand.cars[3].engine property and will accordingly be set on a Car class
+        { field: "manufacturer.year", message: "..." }   // This is an error for Brand.manufacturer.year property and will be set on a Manufacturer class
+    ]
+}
+```
+
+Keep in mind, Yii2 does not have relational save capabilities natively, thus, you need to implement the back end logic yourself.
 
 - `deleteItem( item_id: string|int, remove_from_data: bool )`
 Calls the API to remove the given ID. If `remove_from_data` is true, then after

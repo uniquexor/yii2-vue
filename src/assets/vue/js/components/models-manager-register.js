@@ -50,6 +50,7 @@ class ModelsManagerRegister {
 
             if ( !ModelsManagerRegister.managers[ endpoint_class_name ] ) {
 
+                console.error( endpoint_class_name + ' is not registered with the ModelsManagerRegister' );
                 throw endpoint_class_name + ' is not registered with the ModelsManagerRegister';
             }
 

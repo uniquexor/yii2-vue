@@ -37,7 +37,7 @@ class Model {
      * @param {ModelsManager} models_manager
      * @param {Object} properties
      */
-    constructor( models_manager, properties ) {
+    constructor( models_manager, properties = {} ) {
 
         this.models_manager = models_manager;
 
