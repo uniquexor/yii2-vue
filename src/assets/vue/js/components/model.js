@@ -98,16 +98,18 @@ class Model {
 
                     for ( let i in properties[ key ] ) {
 
-                        used_keys[ i ] = i;
-                        if ( this[ key ][ i ] ) {
+                        let rel_key = properties[ key ][i][ relation.key ];
 
-                            this[ key ][ i ].setProperties( properties[ key ][ i ], delete_missing );
+                        used_keys[ rel_key ] = rel_key;
+                        if ( this[ key ][ rel_key ] ) {
+
+                            this[ key ][ rel_key ].setProperties( properties[ key ][ i ], delete_missing );
                         } else {
 
                             properties[ key ][i] = $.extend( { is_new_record : this.is_new_record }, properties[ key ][i] );
 
                             let relation_obj = Reflect.construct( relation.class_name, [ this.models_manager, properties[ key ][i] ] );
-                            Vue.set( this[ key ], i, relation_obj );
+                            Vue.set( this[ key ], rel_key, relation_obj );
                         }
                     }
 
