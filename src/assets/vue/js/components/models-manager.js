@@ -88,6 +88,7 @@ class ModelsManager {
 
         if ( !this.url_list ) {
 
+            console.error( 'No `url_list` specified.' );
             throw 'No `url_list` specified.';
         }
 
@@ -120,6 +121,7 @@ class ModelsManager {
             function ( jqXhr, status, status_text ) {
 
                 _this.is_loading = false;
+                console.error( status + ': ' + status_text );
                 throw status + ': ' + status_text;
             }
         )
@@ -257,6 +259,7 @@ class ModelsManager {
 
         if ( data.data.name ) {
 
+            console.error( data );
             Vue.set( model.errors, default_key, data.data.name + (data.data.message ? ': ' + data.data.message : '') );
         } else {
 
@@ -290,6 +293,7 @@ class ModelsManager {
                     }
                 } else {
 
+                    console.error( field + ': ' + data.data[ key ].message );
                     Vue.set( model.errors, field, data.data[ key ].message );
                 }
             }
@@ -306,6 +310,7 @@ class ModelsManager {
 
         if ( !url ) {
 
+            console.error( 'URL cannot be empty.' );
             throw 'URL cannot be empty.';
         }
 

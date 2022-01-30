@@ -36,6 +36,7 @@ class Relation {
 
         if ( type !== Relation.TYPE_HAS_MANY && type !== Relation.TYPE_HAS_ONE ) {
 
+            console.error( 'Unknown Relation type' );
             throw 'Unknown Relation type';
         }
 

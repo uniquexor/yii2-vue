@@ -51,6 +51,7 @@ class Model {
 
                 if ( !( relations[ attr ] instanceof Relation ) ) {
 
+                    console.error( this.constructor.name + '::' + attr + ' relation must be an instance of Relation class.' );
                     throw this.constructor.name + '::' + attr + ' relation must be an instance of Relation class.';
                 }
 
@@ -66,6 +67,7 @@ class Model {
 
             if ( !( relations[ attr ] instanceof Relation ) ) {
 
+                console.error( this.constructor.name + '::' + attr + ' relation must be an instance of Relation class.' );
                 throw this.constructor.name + '::' + attr + ' relation must be an instance of Relation class.';
             }
 

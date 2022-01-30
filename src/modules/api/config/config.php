@@ -26,10 +26,5 @@
                     }
                 },
             ],
-            'user' => [
-                'class' => \yii\web\User::class,
-                'enableSession' => false,
-                'loginUrl' => null,
-            ],
         ],
     ];
