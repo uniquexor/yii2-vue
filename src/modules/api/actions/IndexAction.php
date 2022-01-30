@@ -7,6 +7,13 @@
 
     class IndexAction extends \yii\rest\IndexAction {
 
+        /**
+         * A callable, that will receive generated ActiveQuery and DataFilter parameters.
+         * ```
+         * function ( ActiveQuery $query, DataFilter $filter );
+         * ```
+         * @var array|callable
+         */
         public $query_callback;
 
         public function init() {
@@ -53,7 +60,7 @@
                     call_user_func( $this->query_callback, $query, $filter );
                 }
 
-                return \Yii::createObject( [
+                $options = [
                     'class' => ActiveDataProvider::class,
                     'query' => $query,
                     'pagination' => [
@@ -62,7 +69,14 @@
                     'sort' => [
                         'params' => $requestParams,
                     ],
-                ] );
+                ];
+
+                if ( (int) ( $requestParams['pageSize'] ?? -1 ) === 0 ) {
+
+                    $options['pagination'] = false;
+                }
+
+                return \Yii::createObject( $options );
             };
         }
     }
