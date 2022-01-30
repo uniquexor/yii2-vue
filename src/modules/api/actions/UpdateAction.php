@@ -1,6 +1,7 @@
 <?php
     namespace unique\yii2vue\modules\api\actions;
 
+    use unique\yii2vue\modules\api\components\ListChanges;
     use unique\yii2vue\modules\api\interfaces\WithListChangesInterface;
     use yii\db\ActiveRecord;
     use yii\web\ServerErrorHttpException;
