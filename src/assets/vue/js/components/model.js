@@ -97,20 +97,29 @@ class Model {
                 if ( relation.type === Relation.TYPE_HAS_MANY ) {
 
                     let used_keys = {};
+                    let relational_data = properties[ key ];
+                    if ( relation.key ) {
 
-                    for ( let i in properties[ key ] ) {
+                        relational_data = {};
+                        $.each( properties[ key ], function ( index, data ) {
 
-                        let rel_key = properties[ key ][i][ relation.key ];
+                            relational_data[ data[ relation.key ] ] = data;
+                        } );
+                    }
+
+                    for ( let i in relational_data ) {
+
+                        let rel_key = relational_data[i][ relation.key ];
 
                         used_keys[ rel_key ] = rel_key;
                         if ( this[ key ][ rel_key ] ) {
 
-                            this[ key ][ rel_key ].setProperties( properties[ key ][ i ], delete_missing );
+                            this[ key ][ rel_key ].setProperties( relational_data[ i ], delete_missing );
                         } else {
 
-                            properties[ key ][i] = $.extend( { is_new_record : this.is_new_record }, properties[ key ][i] );
+                            relational_data[i] = $.extend( { is_new_record : this.is_new_record }, relational_data[i] );
 
-                            let relation_obj = Reflect.construct( relation.class_name, [ this.models_manager, properties[ key ][i] ] );
+                            let relation_obj = Reflect.construct( relation.class_name, [ this.models_manager, relational_data[i] ] );
                             Vue.set( this[ key ], rel_key, relation_obj );
                         }
                     }

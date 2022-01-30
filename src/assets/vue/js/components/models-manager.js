@@ -139,6 +139,15 @@ class ModelsManager {
 
         let used_keys = {};
 
+        let rel_key = this.model_id;
+        let grouped_data = {};
+        $.each( new_data, function ( index, data ) {
+
+            grouped_data[ data[ rel_key ] ] = data;
+        } );
+
+        new_data = grouped_data;
+
         for ( let i in new_data ) {
 
             used_keys[ i ] = i;
@@ -386,6 +395,7 @@ class ModelsManager {
                 },
                 function ( jqXhr, status, status_text ) {
 
+                    console.error( status + ': ' + status_text );
                     Vue.set( item.errors, _this.model_id, status + ': ' + status_text );
                 }
             );
@@ -438,6 +448,7 @@ class ModelsManager {
                         ModelsManager.handleUnsuccessfulRequest( item, jqXhr.responseJSON, _this.model_id );
                     } else {
 
+                        console.error( status + ': ' + status_text );
                         Vue.set( item.errors, _this.model_id, status + ': ' + status_text );
                     }
                 }
