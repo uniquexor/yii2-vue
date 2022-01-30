@@ -14,9 +14,12 @@
          * [
          *      string $class => [
          *          int|string $list_id => [
+         *              'id' => mixed primary key value,
          *              string $field_name => mixed $new_value,
          *              ...
          *          ],
+         *          // ...or...
+         *          int|string $list_id => null,        // meaning record has been deleted.
          *          ...
          *      ],
          *      ...
@@ -38,7 +41,8 @@
                 $this->list_changes[ $class ][ $list_id ] = [];
             }
 
-            $this->list_changes[ $class ][ $list_id ] += $attrs;
+            // @todo Probably should do something about this hardcoded id...
+            $this->list_changes[ $class ][ $list_id ] += [ 'id' => $list_id ] + $attrs;
         }
 
         /**

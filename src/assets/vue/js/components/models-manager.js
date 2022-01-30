@@ -143,7 +143,13 @@ class ModelsManager {
         let grouped_data = {};
         $.each( new_data, function ( index, data ) {
 
-            grouped_data[ data[ rel_key ] ] = data;
+            if ( data !== null ) {
+
+                grouped_data[ data[ rel_key ] ] = data;
+            } else {
+
+                grouped_data[ index ] = data;
+            }
         } );
 
         new_data = grouped_data;
