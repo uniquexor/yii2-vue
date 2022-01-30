@@ -21,7 +21,7 @@ class Relation {
     class_name = null;
 
     /**
-     * Provides a way for TYPE_HAS_MANY relations to specify which attribute to use for grouping object in an array By default uses primaryKey().
+     * Provides a way for TYPE_HAS_MANY relations to specify which attribute to use for grouping object in an array By default uses `id`.
      * @type {string|null}
      */
     key = null;
@@ -30,9 +30,9 @@ class Relation {
      *
      * @param {string} type - Must be one of Relation constants: TYPE_HAS_ONE or TYPE_HAS_MANY.
      * @param {{mixed}} class_name - Relational object class
-     * @param {string|null} key - Provides a way for TYPE_HAS_MANY relations to specify which attribute to use for grouping object in an array By default uses primaryKey().
+     * @param {string|null} key - Provides a way for TYPE_HAS_MANY relations to specify which attribute to use for grouping object in an array By default uses `id`.
      */
-    constructor( type, class_name, key ) {
+    constructor( type, class_name, key = 'id' ) {
 
         if ( type !== Relation.TYPE_HAS_MANY && type !== Relation.TYPE_HAS_ONE ) {
 
@@ -42,10 +42,6 @@ class Relation {
 
         this.type = type;
         this.class_name = class_name;
-
-        if ( typeof( key ) !== 'undefined' ) {
-
-            this.key = key;
-        }
+        this.key = key;
     }
 }

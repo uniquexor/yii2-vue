@@ -109,7 +109,11 @@ class Model {
 
                     for ( let i in relational_data ) {
 
-                        let rel_key = relational_data[i][ relation.key ];
+                        let rel_key = i;
+                        if ( relation.key ) {
+
+                            rel_key = relational_data[i][ relation.key ];
+                        }
 
                         used_keys[ rel_key ] = rel_key;
                         if ( this[ key ][ rel_key ] ) {
