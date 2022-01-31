@@ -58,7 +58,7 @@
                     continue;
                 }
 
-                $file = $file->getFilename();
+                $file = substr( $file->getRealPath(), strlen( $path ) + 1 );
 
                 if ( str_ends_with( $file, '.js' ) ) {
 
