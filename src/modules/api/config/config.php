@@ -16,7 +16,7 @@
                      * @var Response $response
                      */
                     $response = $event->sender;
-                    if ( $response->data !== null && ( !isset( $response->data['success'] ) || !isset( $response->data['data'] ) ) ) {
+                    if ( !isset( $response->data['success'] ) || !isset( $response->data['data'] ) ) {
 
                         $response->data = [
                             'success' => $response->isSuccessful,
