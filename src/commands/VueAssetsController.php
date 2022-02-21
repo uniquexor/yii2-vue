@@ -105,7 +105,7 @@
                         $is_primitives = false;
                         if ( $relation === null ) {
 
-                            $relation = $type . ( $is_array ? '[]' : '' );
+                            $relation = $type;
                         } else {
 
                             $relation = false;
