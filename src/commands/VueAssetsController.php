@@ -29,6 +29,11 @@
                 ', ' . $attribute_type . ' )';
         }
 
+        protected function beforeWrite( string $template, string $object_class, \ReflectionClass $reflection ): string {
+
+            return $template;
+        }
+
         public function actionGenerateModel( ?string $class = null ) {
 
             if ( !$this->vue_asset_models_path || !file_exists( $this->vue_asset_models_path ) || !is_dir( $this->vue_asset_models_path ) ) {
@@ -171,6 +176,8 @@
 
                 $model_template = str_replace( $matches[0], implode( "\r\n", $primary_keys ), $model_template );
             }
+
+            $model_template = $this->beforeWrite( $model_template, $obj::class, $reflection );
 
             file_put_contents( $this->vue_asset_models_path . $file_name, $model_template );
             $this->stdout( 'Done.' );
