@@ -11,6 +11,7 @@
         public string $mixins_path = 'js/mixins/';
         public string $components_path = 'js/components/';
         public string $models_path = 'js/models/';
+        public string $css_path = 'css/';
 
         protected function loadPath( string $path, bool $recursively = true ) {
 
@@ -97,7 +98,7 @@
 
         public function addCss( string $name, ?string $package = null ) {
 
-            $path = ( $package ? $package . '/' : '' ) . $name . '.css';
+            $path = $this->css_path . ( $package ? $package . '/' : '' ) . $name . '.css';
             $this->css[ $path ] = $path;
             return $this;
         }
