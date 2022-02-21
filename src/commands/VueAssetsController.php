@@ -83,7 +83,7 @@
 
             $reflection = new \ReflectionClass( $obj::class );
             $doc = $reflection->getDocComment();
-            preg_match_all( '/@property *([\w|_0-9[\]]+) *\$(.*)/m', $doc, $matches, PREG_SET_ORDER );
+            preg_match_all( '/@property *([\w|_0-9[\]]+) *\$([^ ]*)/m', $doc, $matches, PREG_SET_ORDER );
             foreach ( $matches as $match ) {
 
                 $types = explode( '|', $match[1] );
