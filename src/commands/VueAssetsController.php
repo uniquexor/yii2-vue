@@ -26,7 +26,7 @@
         protected function generateRelation( string $attribute_name, string $attribute_type, bool $is_array, string $padding ) {
 
             return $padding . $attribute_name . ': new Relation( Relation.' . ( $is_array ? 'TYPE_HAS_MANY' : 'TYPE_HAS_ONE' ) .
-                ', ' . $attribute_type . ' ),';
+                ', ' . $attribute_type . ' )';
         }
 
         public function actionGenerateModel( ?string $class = null ) {
@@ -130,10 +130,16 @@
 
                     if ( $relation ) {
 
-                        $relations[] = $this->generateRelation( trim( $match[2] ), $relation, $is_array, $relations_template );
+                        if ( $rel = $this->generateRelation( trim( $match[2] ), $relation, $is_array, $relations_template ) ) {
+
+                            $relations[] = $rel;
+                        }
                     } else {
 
-                        $to_body[] = $this->generateBody( trim( $match[2] ), trim( $match[1] ), $to_body_template );
+                        if ( $attr = $this->generateBody( trim( $match[2] ), trim( $match[1] ), $to_body_template ) ) {
+
+                            $to_body[] = $attr;
+                        }
                     }
                 }
             }
@@ -150,7 +156,7 @@
 
             if ( $relations_template ) {
 
-                $model_template = str_replace( $relations_template . '__RELATIONS__', implode( "\r\n", $relations ), $model_template );
+                $model_template = str_replace( $relations_template . '__RELATIONS__', implode( ",\r\n", $relations ), $model_template );
             }
 
             if ( preg_match( '/^([\s]*)__SET_PRIMARY_KEYS__/m', $model_template, $matches ) ) {
