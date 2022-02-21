@@ -94,4 +94,11 @@
             $this->js[ $this->models_path . $name . '.js' ] = $this->models_path . $name . '.js';
             return $this;
         }
+
+        public function addCss( string $name, ?string $package = null ) {
+
+            $path = ( $package ? $package . '/' : '' ) . $name . '.css';
+            $this->css[ $path ] = $path;
+            return $this;
+        }
     }
