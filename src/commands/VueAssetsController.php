@@ -18,6 +18,17 @@
          */
         public string $js_model_template_path = __DIR__ . DIRECTORY_SEPARATOR . '__vue_model_template.js';
 
+        protected function generateBody( string $attribute_name, string $attribute_type, string $padding ) {
+
+            return $padding . $attribute_name . ': this.' . $attribute_name;
+        }
+
+        protected function generateRelation( string $attribute_name, string $attribute_type, bool $is_array, string $padding ) {
+
+            return $padding . $attribute_name . ': new Relation( Relation.' . ( $is_array ? 'TYPE_HAS_MANY' : 'TYPE_HAS_ONE' ) .
+                ', ' . $attribute_type . ' ),';
+        }
+
         public function actionGenerateModel( ?string $class = null ) {
 
             if ( !$this->vue_asset_models_path || !file_exists( $this->vue_asset_models_path ) || !is_dir( $this->vue_asset_models_path ) ) {
@@ -119,11 +130,10 @@
 
                     if ( $relation ) {
 
-                        $relations[] = $relations_template . trim( $match[2] ) . ': new Relation( Relation.' . ( $is_array ? 'TYPE_HAS_MANY' : 'TYPE_HAS_ONE' ) .
-                            ', ' . $relation . ' ),';
+                        $relations[] = $this->generateRelation( trim( $match[2] ), $relation, $is_array, $relations_template );
                     } else {
 
-                        $to_body[] = $to_body_template . trim( $match[2] ) . ': this.' . trim( $match[2] );
+                        $to_body[] = $this->generateBody( trim( $match[2] ), trim( $match[1] ), $to_body_template );
                     }
                 }
             }
