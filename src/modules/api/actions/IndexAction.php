@@ -1,6 +1,7 @@
 <?php
     namespace unique\yii2vue\modules\api\actions;
 
+    use unique\yii2vue\modules\api\interfaces\SearchQueryInterface;
     use yii\data\ActiveDataProvider;
     use yii\db\ActiveQuery;
     use yii\db\BaseActiveRecord;
@@ -32,6 +33,8 @@
                  * @var \yii\db\BaseActiveRecord $modelClass
                  * @var BaseActiveRecord $model
                  */
+
+                $query = null;
                 $modelClass = $this->modelClass;
                 if ( $this->dataFilter && $this->dataFilter->searchModel ) {
 
@@ -44,15 +47,23 @@
 
                         return $this->dataFilter;
                     }
+
+                    if ( $model instanceof SearchQueryInterface ) {
+
+                        $query = $model->getSearchQuery();
+                    }
                 }
 
                 /**
                  * @var ActiveQuery $query
                  */
-                $query = $modelClass::find();
-                if ( !empty( $filter ) ) {
+                if ( $query === null ) {
 
-                    $query->andWhere( $filter );
+                    $query = $modelClass::find();
+                    if ( !empty( $filter ) ) {
+
+                        $query->andWhere( $filter );
+                    }
                 }
 
                 if ( $this->query_callback ) {
