@@ -22,6 +22,11 @@
             if ( $res = $model->save() ) {
 
                 $expand = \Yii::$app->request->get( '_expand', [] );
+                if ( is_string( $expand ) ) {
+
+                    $expand = explode( ',', $expand );
+                    $expand = array_map( 'trim', $expand );
+                }
 
                 if ( $res instanceof ListChanges && $this->controller instanceof WithListChangesInterface ) {
 
