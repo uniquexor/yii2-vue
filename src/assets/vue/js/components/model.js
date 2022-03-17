@@ -128,7 +128,7 @@ class Model {
                         }
                     }
 
-                    if ( !delete_missing ) {
+                    if ( delete_missing ) {
 
                         for ( let i in this[ key ] ) {
 
