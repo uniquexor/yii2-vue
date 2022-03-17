@@ -196,4 +196,14 @@ class Model {
 
         return data;
     }
+
+    /**
+     * Returns true if a field exists in toBody() method's returned object.
+     * @param {string} field - Field name
+     * @returns {boolean}
+     */
+    hasField( field ) {
+
+        return typeof( this.toBody()[ field ] ) !== 'undefined';
+    }
 }
