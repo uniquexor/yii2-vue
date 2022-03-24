@@ -62,6 +62,11 @@
                 $file = substr( $file->getRealPath(), strlen( $path ) + 1 );
                 $file = str_replace( '\\', '/', $file );
 
+                if ( YII_DEBUG && str_ends_with( $file, '.min.js' ) ) {
+
+                    continue;
+                }
+
                 // We only want either .min.js or .js:
                 $file_no_ext = explode( '.', $file );
                 $file_no_ext = $file_no_ext[0];
