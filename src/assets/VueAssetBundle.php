@@ -62,12 +62,16 @@
                 $file = substr( $file->getRealPath(), strlen( $path ) + 1 );
                 $file = str_replace( '\\', '/', $file );
 
+                // We only want either .min.js or .js:
+                $file_no_ext = explode( '.', $file );
+                $file_no_ext = $file_no_ext[0];
+
                 if ( str_ends_with( $file, '.js' ) ) {
 
-                    $this->js[ $relative_path . $file ] = $relative_path . $file;
+                    $this->js[ $relative_path . $file_no_ext . '.js' ] = $relative_path . $file;
                 } elseif ( str_ends_with( $file, '.css' ) ) {
 
-                    $this->css[ $relative_path . $file ] = $relative_path . $file;
+                    $this->css[ $relative_path . $file_no_ext . '.js' ] = $relative_path . $file;
                 }
             }
         }
