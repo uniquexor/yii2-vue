@@ -17,6 +17,8 @@
          */
         public $query_callback;
 
+        public bool $is_multisort_enabled = false;
+
         public function init() {
 
             parent::init();
@@ -79,6 +81,7 @@
                     ],
                     'sort' => [
                         'params' => $requestParams,
+                        'enableMultiSort' => $this->is_multisort_enabled,
                     ],
                 ];
 
