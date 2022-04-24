@@ -159,7 +159,13 @@ class ModelsManager {
             used_keys[ i ] = i;
             if ( this.data[ i ] ) {
 
-                this.data[ i ].setProperties( new_data[ i ], delete_missing );
+                if ( new_data[i] === null ) {
+
+                    Vue.delete( this.data, i );
+                } else {
+
+                    this.data[ i ].setProperties( new_data[ i ], delete_missing );
+                }
             } else {
 
                 new_data[ i ] = $.extend( { is_new_record : false }, new_data[ i ] );
