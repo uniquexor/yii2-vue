@@ -29,6 +29,13 @@
                 $this->controller->setListChanges( $res );
             }
 
-            return $model;
+            $expand = \Yii::$app->request->get( '_expand', [] );
+            if ( is_string( $expand ) ) {
+
+                $expand = explode( ',', $expand );
+                $expand = array_map( 'trim', $expand );
+            }
+
+            return $model->toArray( [], $expand );
         }
     }
