@@ -29,6 +29,11 @@
                 $this->controller->setListChanges( $res );
             }
 
+            if ( $model->hasErrors() ) {
+
+                return $model;
+            }
+
             $expand = \Yii::$app->request->get( '_expand', [] );
             if ( is_string( $expand ) ) {
 
