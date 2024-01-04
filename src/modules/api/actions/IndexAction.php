@@ -17,6 +17,15 @@
          */
         public $query_callback;
 
+        /**
+         * A callable, that will receive and must return a configuration array for the DataProvider.
+         * ```
+         * function ( array $options );
+         * ```
+         * @var array|callable
+         */
+        public $provider_options_callback;
+
         public bool $is_multisort_enabled = false;
 
         public function init() {
@@ -88,6 +97,11 @@
                 if ( (int) ( $requestParams['pageSize'] ?? -1 ) === 0 ) {
 
                     $options['pagination'] = false;
+                }
+
+                if ( $this->provider_options_callback ) {
+
+                    $options = call_user_func( $this->provider_options_callback, $options );
                 }
 
                 return \Yii::createObject( $options );
