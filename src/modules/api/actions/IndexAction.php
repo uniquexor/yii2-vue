@@ -94,7 +94,7 @@
                     ],
                 ];
 
-                if ( (int) ( $requestParams['pageSize'] ?? -1 ) === 0 ) {
+                if ( (int) ( $requestParams['per-page'] ?? -1 ) === 0 ) {
 
                     $options['pagination'] = false;
                 }
